@@ -278,3 +278,23 @@
     background-color: blue !important;
     font-weight: 800 !important;
 }
+
+.savePost {
+    margin-top: 2rem;
+    background-color: #0070f3 !important;
+    width: 12rem;
+}
+
+.btnBack {
+    margin-top: 2rem;
+    background-color: #f3f5f8 !important;
+    width: 10rem;
+    color: #000000 !important;
+    margin-right: 0.4rem;
+}
+
+.upload {
+    padding: 1rem;
+    color: #fff;
+    background-color: #1ec61e !important;
+}

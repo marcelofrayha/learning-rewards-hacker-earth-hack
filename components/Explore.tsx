@@ -28,25 +28,25 @@ const JOURNEY_API_URL =
 function Explore() {
   const router = useRouter()
 
-  const [fetchedQuests, setFetchedQuests] = useState<any[]>([])
+  const [fetchedQuests, setFetchedQuests] = useState<any>([])
   const [isLoading, setLoading] = useState<boolean>(false)
 
   // fetches quest
   useEffect(() => {
     async function fetchQuests() {
-      setLoading(true);
+      setLoading(true)
       try {
-        const response = await fetch(`${JOURNEY_API_URL}/api/quests`);
-        const { quests } = await response.json();
-        console.log("fetched quests: ", quests);
-        setFetchedQuests(quests);
+        const response = await fetch(`${JOURNEY_API_URL}/api/quests`)
+        const { quests } = await response.json()
+        console.log('fetched quests: ', quests)
+        setFetchedQuests(quests)
       } catch (err) {
-        console.log(err);
+        console.log(err)
       }
-      setLoading(false);
+      setLoading(false)
     }
-    fetchQuests();
-  }, []);
+    fetchQuests()
+  }, [])
 
   // function handleClick(e: any, id: string) {
   //   e.preventDefault()

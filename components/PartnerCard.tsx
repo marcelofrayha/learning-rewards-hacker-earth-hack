@@ -35,7 +35,7 @@ export default function QuestCard({
             <HStack>
               <RewardPill imageUrl="/l.png" label={task.level} />
               <RewardPill imageUrl="/coin.png" label="1 USDC" />
-              <RewardPill imageUrl="/badge.svg" label="100XP" />
+              <RewardPill imageUrl="/badgeicon.png" label="100Points" />
             </HStack>
           </VStack>
         </HStack>

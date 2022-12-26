@@ -7,13 +7,13 @@ import { useState } from 'react'
 import { handleDisconnect } from '@utils/web3'
 import { useRouter } from 'next/router'
 
-const Navbar = () => {
+const Navbar = ({ account }) => {
   const { address, setAddress } = useTron()
   const router = useRouter()
   const [isHover, setIsHover] = useState<boolean>(false)
   const [isLoading, setLoading] = useState<boolean>(false)
 
-  if (!address) return
+  if (!account) return
 
   function handleNavigate() {
     router.push('/')
@@ -35,6 +35,7 @@ const Navbar = () => {
             <Link href="/tasks">
               <Text>Tasks</Text>
             </Link>
+
             <Link href="/create">
               <Text>Create Tasks</Text>
             </Link>
@@ -42,11 +43,31 @@ const Navbar = () => {
               <Text>My Profile</Text>
             </Link>
             <Link href="/community">
-              <Text>Community</Text>
+              <Text>Leaderboard</Text>
             </Link>
             {/* <Link href="/partners">
           <Text>Partners</Text>
         </Link>  */}
+
+            {account && (
+              <Button
+                className={styles.addressPill}
+                // onClick={() =>
+                //   handleDisconnect(setLoading, setAddress, handleNavigate)
+                // }
+                onMouseEnter={() => setIsHover(true)}
+                onMouseLeave={() => setIsHover(false)}
+              >
+                {isLoading ? (
+                  <Spinner color="white" />
+                ) : isHover ? (
+                  'Disconnect'
+                ) : (
+                  abridgeAddress(account)
+                )}
+              </Button>
+            )}
+
             {address && (
               <Button
                 className={styles.addressPill}

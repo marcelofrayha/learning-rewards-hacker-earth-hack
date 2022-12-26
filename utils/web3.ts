@@ -32,7 +32,6 @@ async function createUser(address: string) {
 }
 
 export async function handleConnect(setLoading, setAddress, provider) {
-  console.log('YAY')
   setLoading(true)
   try {
     await provider.request({

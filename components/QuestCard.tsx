@@ -1,17 +1,17 @@
-import { Text, VStack, HStack, Image, Box, SimpleGrid } from "@chakra-ui/react";
-import styles from "../styles/Home.module.css";
-import RewardPill from "./RewardPill";
+import { Text, VStack, HStack, Image, Box, SimpleGrid } from '@chakra-ui/react'
+import styles from '../styles/Home.module.css'
+import RewardPill from './RewardPill'
 
 type QuestCardProps = {
-  title: string;
-  description: string;
-  partner: any;
-  xp: number;
-  nft_reward: any;
-  token_reward: any;
-  handleClick: (e: any) => void;
-  isLocked?: boolean;
-};
+  title: string
+  description: string
+  partner: any
+  xp: number
+  nft_reward: any
+  token_reward: any
+  handleClick: (e: any) => void
+  isLocked?: boolean
+}
 
 export default function QuestCard({
   title,
@@ -51,7 +51,7 @@ export default function QuestCard({
             />
           )}
           {nft_reward && <RewardPill imageUrl="/badge.svg" label="NFT Badge" />}
-          <RewardPill imageUrl="/sparkle.svg" label={`${xp} XP`} />
+          <RewardPill imageUrl="./" label={`${xp} XP`} />
         </HStack>
       </VStack>
       <Box w={144} opacity={isLocked ? 0.55 : 1}>
@@ -62,5 +62,5 @@ export default function QuestCard({
         ></Image>
       </Box>
     </HStack>
-  );
+  )
 }

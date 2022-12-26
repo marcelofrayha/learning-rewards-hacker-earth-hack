@@ -31,7 +31,6 @@ export const TronProvider = ({ children }: any) => {
 
   // hook to handle address changes
   useEffect(() => {
-    console.log('pppp')
     const fetchedAddress = window.localStorage.getItem('TRON_ADDRESS')
     if (!address && fetchedAddress) setAddress(fetchedAddress)
     if (address && address !== fetchedAddress)
