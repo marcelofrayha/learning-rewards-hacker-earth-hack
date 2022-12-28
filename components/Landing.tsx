@@ -8,10 +8,49 @@ import { MyAppContext } from '../pages/_app'
 import { ethers } from "ethers"
 import { ABI } from '../abis/ABI'
 import hre from 'hardhat'
+import { InjectedConnector } from "@web3-react/injected-connector";
+import { useEthers } from "@usedapp/core"
+
+const injected = new InjectedConnector({ supportedChainIds: [1, 4, 1001] });
+
+
+const getEthereumObject = () => window.ethereum;
+
+/*
+ * This function returns the first linked account found.
+ * If there is no account linked, it will return null.
+ */
+const findAccount = async () => {
+  try {
+    const ethereum = getEthereumObject();
+
+    /*
+    * First make sure we have access to the Ethereum object.
+    */
+    if (!ethereum) {
+      console.error("Make sure you have Metamask!");
+      return null;
+    }
+
+    console.log("We have the Ethereum object", ethereum);
+    const accounts = await ethereum.request({ method: "eth_accounts" });
+
+    if (accounts.length !== 0) {
+      const account = accounts[0];
+      console.log("Found an authorized account:", account);
+      return account;
+    } else {
+      console.error("No authorized account found");
+      return null;
+    }
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+};
 
 function Landing() {
   const [isLoading, setLoading] = useState<boolean>(false)
-
   const {
     account,
     setAccount,
@@ -25,15 +64,29 @@ function Landing() {
     setAllTasks,
   } = useContext(MyAppContext)
 
-  // useEffect(() => {
-  //   setN(new Date().getTime())
-  // }, [])
+  /*
+   * The passed callback function will be run when the page loads.
+   * More technically, when the App component "mounts".
+   */
 
   const connectWallet = async () => {
-    if (!window.ethereum) {
-      console.log('please install MetaMask')
-      return
+    try {
+      const ethereum = getEthereumObject();
+      if (!ethereum) {
+        alert("Get a Wallet!");
+        return;
+      }
+
+      const accounts = await ethereum.request({
+        method: "eth_requestAccounts",
+      });
+
+      console.log("Connected", accounts[0]);
+      setAccount(accounts[0]);
+    } catch (error) {
+      console.error(error);
     }
+
     const providerTemp = new ethers.providers.Web3Provider(window.ethereum)
     setProvider(providerTemp)
     const { chainId } = await providerTemp.getNetwork()
@@ -49,18 +102,64 @@ function Landing() {
     } else {
       alert('Please connect to Klaynt Test Network!')
     }
+  };
 
-    // MetaMask requires requesting permission to connect users accounts
-    providerTemp
-      .send('eth_requestAccounts', [])
-      .then((accounts) => {
-        if (accounts.length > 0) {
-          setAccount(accounts[0])
-          // localStorage('currentAccount', accounts[0])
-        }
-      })
-      .catch((e) => console.log(e))
-  }
+  useEffect(() => {
+    findAccount().then((account) => {
+      if (account !== null) {
+        setAccount(account);
+      }
+    });
+  }, []);
+
+  const { activate } = useEthers();
+
+  useEffect(() => {
+    injected.isAuthorized().then((isAuthorized) => {
+      if (isAuthorized) {
+        activate(injected);
+      }
+    });
+  }, [activate]); 
+
+  
+
+  // useEffect(() => {
+  //   setN(new Date().getTime())
+  // }, [])
+
+  // const connectWallet = async () => {
+  //   if (!window.ethereum) {
+  //     console.log('please install MetaMask')
+  //     return
+  //   }
+  //   const providerTemp = new ethers.providers.Web3Provider(window.ethereum)
+  //   setProvider(providerTemp)
+  //   const { chainId } = await providerTemp.getNetwork()
+  //   console.log('here chainId', chainId)
+  //   const deployedContract = '0xc5E2df91ff790fb46FF0A8BfFf69A2F87fC293bc'
+  //   const signer = providerTemp.getSigner()
+  //   setSigner(signer)
+
+  //   if (chainId == '1001') {
+  //     let tempContract = new ethers.Contract(deployedContract, ABI, signer)
+  //     setContract(tempContract)
+  //     getAllTasks(tempContract)
+  //   } else {
+  //     alert('Please connect to Klaynt Test Network!')
+  //   }
+
+  //   // MetaMask requires requesting permission to connect users accounts
+  //   providerTemp
+  //     .send('eth_requestAccounts', [])
+  //     .then((accounts) => {
+  //       if (accounts.length > 0) {
+  //         setAccount(accounts[0])
+  //         // localStorage('currentAccount', accounts[0])
+  //       }
+  //     })
+  //     .catch((e) => console.log(e))
+  // }
 
   const getAllTasks = async (contract) => {
     const allTasks = await contract.getAllTasks()

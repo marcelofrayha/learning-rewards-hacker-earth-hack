@@ -85,9 +85,9 @@ function Create() {
     if (!account || !contract) alert('Please connect your wallet!')
 
     try {
-      let getAllTasksByOwner = await contract.getAllTasksByOwner("0xab9c475dE99c213DB8c9CAaE86478CCEA367f508")
-      getAllTasksByOwner = getAllTasksByOwner.toString()
-      console.log("This owner has: ", getAllTasksByOwner)
+      const completeTask = await contract.completeTask("0x4054d8969a12209b6d3C9Cd99377C759303823CD", 1)
+      await completeTask.wait()
+      let transferReward = await contract.transferReward(1)
     } catch (error) {
       console.log(error)
     }
@@ -132,16 +132,16 @@ function Create() {
         const fullUrl = `https://cloudflare-ipfs.com/ipfs/${url}`
         console.log('fullUrl', fullUrl)
 
-        // const saveToContract = await contract.addTask(
-        //   fullUrl,
-        //   rewardAmountInt,
-        //   subscriptionFeeInt,
-        //   { value: ethers.utils.parseEther(rewardAmount) },
-        // )
-        // const tx = await saveToContract.wait()
-        // console.log('___tx__', tx)
-        // const transationId = tx?.to
-        // console.log('transationId', transationId)
+        const saveToContract = await contract.addTask(
+          fullUrl,
+          rewardAmountInt,
+          subscriptionFeeInt,
+          { value: ethers.utils.parseEther(rewardAmount) },
+        )
+        const tx = await saveToContract.wait()
+        console.log('___tx__', tx)
+        const transationId = tx?.to
+        console.log('transationId', transationId)
 
         // const getAllTasks = await contract.getAllTasks()
         // console.log("All Tasks are here: ", getAllTasks)
@@ -165,9 +165,10 @@ function Create() {
         // let getAllTasksByOwner = await contract.getAllTasksByOwner("0xab9c475dE99c213DB8c9CAaE86478CCEA367f508")
         // getAllTasksByOwner = getAllTasksByOwner.toString()
 
+        // const completeTask = await contract.completeTask("0x4054d8969a12209b6d3C9Cd99377C759303823CD", 1)
+        // await completeTask.wait()
+        // let transferReward = await contract.transferReward(1)
         
-
-
         // on  success display a button 'See Transaction'
         //  href https://baobab.scope.klaytn.com/tx/ + txID 0x014ce3aa8bd20739287837f03d7319159310028e21a6b43f8b90a9ea540279a8
       }
