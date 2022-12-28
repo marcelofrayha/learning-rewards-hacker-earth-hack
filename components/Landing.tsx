@@ -5,8 +5,9 @@ import styles from '../styles/Home.module.css'
 import { useTron } from './TronProvider'
 import withTransition from './withTransition'
 import { MyAppContext } from '../pages/_app'
-const { ethers } = require('ethers')
+import { ethers } from "ethers"
 import { ABI } from '../abis/ABI'
+import hre from 'hardhat'
 
 function Landing() {
   const [isLoading, setLoading] = useState<boolean>(false)
@@ -37,7 +38,7 @@ function Landing() {
     setProvider(providerTemp)
     const { chainId } = await providerTemp.getNetwork()
     console.log('here chainId', chainId)
-    const deployedContract = '0xc7086899d02Cdd5C1B0cDa32CB50aaB9a2edC416'
+    const deployedContract = '0xc5E2df91ff790fb46FF0A8BfFf69A2F87fC293bc'
     const signer = providerTemp.getSigner()
     setSigner(signer)
 
@@ -66,7 +67,7 @@ function Landing() {
     console.log('🚀Landing.tsx:79 ~ getAllTasks ~ allTasks', allTasks)
     setAllTasks(allTasks)
   }
-
+    
   return (
     <div className={styles.container}>
       <main className={styles.landing}>

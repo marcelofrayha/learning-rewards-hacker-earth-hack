@@ -13,6 +13,7 @@ function CreateContentFirstPart({
   setLevel,
   setRewardAmount,
   setExperiencePoint,
+  setSubscriptionFee,
 }) {
  
   // const [tittle, setTitle] = useState<string>('')
@@ -84,12 +85,12 @@ function CreateContentFirstPart({
         />
 
         <Text mb="8px" style={{ paddingTop: '1rem' }}>
-          Experience Points
+          Subscription Fee
         </Text>
         <Input
           // value={question}
-          onChange={(e) => setExperiencePoint(e.target.value)}
-          placeholder="Experience Points"
+          onChange={(e) => setSubscriptionFee(e.target.value)}
+          placeholder="Subscription Fee"
           size="md"
         />
       </div>

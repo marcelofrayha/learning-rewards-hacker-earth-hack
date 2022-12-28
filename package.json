@@ -16,14 +16,17 @@
         "@mui/icons-material": "^5.11.0",
         "@mui/material": "^5.11.0",
         "axios": "^1.1.3",
+        "ethers": "^5.6.4",
         "framer-motion": "^6.5.1",
+        "hardhat": "^2.12.4",
         "next": "13.0.0",
+        "nft.storage": "^7.0.0",
         "react": "18.2.0",
         "react-confetti": "^6.1.0",
         "react-dom": "18.2.0",
         "react-icons": "^4.6.0",
         "react-lottie": "^1.2.3",
-        "ethers": "^5.6.4",
+        "thirdweb": "^0.9.7",
         "uuid": "^9.0.0"
     },
     "devDependencies": {

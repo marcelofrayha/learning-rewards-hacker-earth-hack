@@ -5,8 +5,8 @@ import { ChakraProvider, extendTheme } from '@chakra-ui/react'
 import Head from 'next/head'
 import Navbar from '@components/Navbar'
 import Footer from '@components/Footer'
-import { TronProvider } from '@components/TronProvider'
 import { useEffect, useState } from 'react'
+
 
 const theme = extendTheme({
   styles: {
@@ -52,8 +52,6 @@ export default function App({ Component, pageProps, router }: AppProps) {
   const [provider, setProvider] = useState('')
   const [signer, setSigner] = useState('')
   const [allTasks, setAllTasks] = useState('')
-
-  console.log('NEW_contract', contract)
 
   // const [balance, setBalance] = useState('')
 
@@ -125,7 +123,11 @@ export default function App({ Component, pageProps, router }: AppProps) {
     //   </TronProvider>
     // </ChakraProvider> */
   }
-  console.log('allTasks', allTasks)
+
+  const getEthereumObject = () => window.ethereum;
+
+  
+
 
   return (
     <ChakraProvider theme={theme}>

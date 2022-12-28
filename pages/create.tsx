@@ -1,13 +1,15 @@
 import { Box, Button, useColorModeValue, Text, Input } from '@chakra-ui/react'
-
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { NFTStorage, File } from 'nft.storage'
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import styles from '../styles/Home.module.css'
 import { useRouter } from 'next/router'
 import CreateContentFirstPart from '@components/CreateContentFirstPart'
 import withTransition from '@components/withTransition'
 import { apiKey } from '../components/APIKEYS'
+import { MyAppContext } from '../pages/_app'
+import { ethers } from 'ethers'
 
-const CustomeInput = ({ e, tempOption, setTempOption }) => {
+const CustomeInput = ({ setTempOption }) => {
   return (
     <div style={{ paddingLeft: '3rem', paddingTop: '1rem', width: '80%' }}>
       <Input
@@ -20,6 +22,56 @@ const CustomeInput = ({ e, tempOption, setTempOption }) => {
 }
 
 function Create() {
+  const { account, contract } = useContext(MyAppContext)
+
+  const dummyData = [
+    {
+      question: 'How do you connect to the Klaytn blockchain?',
+      answers: [
+        'You can connect to the Klaytn blockchain by installing the Klaytn Wallet app on your mobile device or by using a browser extension like MetaMask on your desktop.',
+        'You can connect to the Klaytn blockchain by connecting to a public node using an API or by running your own node and connecting to it.',
+        'You can connect to the Klaytn blockchain by sending a connection request to the Klaytn team and waiting for their approval.',
+        'You can connect to the Klaytn blockchain by purchasing a Klaytn token and using it to access the network.',
+      ],
+      correct: 1,
+    },
+    {
+      question:
+        'What do you need to consider when connecting to the Klaytn blockchain?',
+      answers: [
+        'You need to consider the type of node you want to connect to (e.g. public or private) and whether you want to use an API or run your own node.',
+        'You need to consider the type of device you are using and whether it is compatible with the Klaytn Wallet app or a browser extension like MetaMask.',
+        'You need to consider the amount of Klaytn tokens you have and whether you have enough to access the network.',
+        'All of the above.',
+      ],
+      correct: 4,
+    },
+
+    {
+      question: 'What is the Klaytn Wallet app?',
+      answers: [
+        'The Klaytn Wallet app is a mobile app that allows you to manage your Klaytn accounts, send and receive KLAY tokens, and interact with dApps on the Klaytn blockchain.',
+        'The Klaytn Wallet app is a desktop application that allows you to connect to the Klaytn blockchain and manage your KLAY tokens.',
+        'The Klaytn Wallet app is a browser extension that allows you to connect to the Klaytn blockchain and interact with dApps.',
+        'The Klaytn Wallet app is a tool for developers to test and debug their dApps on the Klaytn blockchain.',
+      ],
+      correct: 1,
+    },
+  ]
+  const [creatingQuiz, setCreatingQuiz] = useState<boolean>(false)
+  //   - show success
+
+  // First part
+  const [title, setTitle] = useState<string>('')
+  const [image, setImage] = useState<string>('')
+  const [description, setDescription] = useState<string>('')
+  const [level, setLevel] = useState<string>('')
+  const [rewardAmount, setRewardAmount] = useState<string>('')
+  const [experiencePoint, setExperiencePoint] = useState<string>('')
+  const [subscriptionFee, setSubscriptionFee] = useState<string>('')
+  const router = useRouter()
+
+  // Second part
   const [data, setData] = useState<any>([])
   const [showFirstPart, setShowFirstPart] = useState<boolean>(true)
   const [question, setQuestion] = useState<string>('')
@@ -28,79 +80,101 @@ function Create() {
   const [tempOption, setTempOption] = useState<string>('')
   const [optionArray, setOptionArray] = useState<any>([])
   const [optionList, setOptionList] = useState<any>([])
-  // First part
-  const [title, setTitle] = useState<string>('')
-  const [image, setImage] = useState<string>('')
-  const [description, setDescription] = useState<string>('')
-  const [level, setLevel] = useState<string>('')
-  const [rewardAmount, setRewardAmount] = useState<string>('')
-  const [experiencePoint, setExperiencePoint] = useState<string>('')
-  const router = useRouter()
 
-  console.log(
-    'A',
-    title,
-    image,
-    description,
-    level,
-    rewardAmount,
-    experiencePoint,
-    // subscription fee
+  const run = async () => {
+    if (!account || !contract) alert('Please connect your wallet!')
 
-    // FE to IPFS
-    // i need:
-    //  - format FP &SP to an obj
-    //     curObj = {
+    try {
+      let getAllTasksByOwner = await contract.getAllTasksByOwner("0xab9c475dE99c213DB8c9CAaE86478CCEA367f508")
+      getAllTasksByOwner = getAllTasksByOwner.toString()
+      console.log("This owner has: ", getAllTasksByOwner)
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
-    //       image: '',
-    //   title: 'Aleo Basics',
-    //   description:
-    //     'Aleo Basics concepts to get started in your journey with Aleo.',
-    //   rewardAmount: '0.99 USDC',
-    //   experiencePoint: '100LE',
-    //   level,
-    //   creator: 'address',
-    //   id: 1,
-    //   subscriptionFee: '',
-    //   tempQuizArray = [obj, obj]
-    //     }
+  const SaveAllAndPublish = async () => {
+    if (!account || !contract) alert('Please connect your wallet!')
 
-    // - IPFS returns a CID
-    // - To save CID into contract
-    //   - call createTask(string CID, uint rewardAmount, uint subscriptionFee)
-    //   - show success
+    try {
+      setCreatingQuiz(true)
+      const rewardAmountInt = Number(rewardAmount)
+      const subscriptionFeeInt = Number(subscriptionFee)
 
-    //   - redirect to All tasksPage
+      const obj = {
+        image: image
+          ? image
+          : 'https://images.unsplash.com/photo-1639737496523-ea268d39924d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=686&q=80',
 
-    //  A TASK (first part)
-    // {
-    //   image: '',
-    //   title: 'Aleo Basics',
-    //   description:
-    //     'Aleo Basics concepts to get started in your journey with Aleo.',
-    //   rewardAmount: '0.99 USDC',
-    //   experiencePoint: '100LE',
-    //   level,
-    //   creator: 'address',
-    //   id: 1,
-    //   subscriptionFee: '',
-    // },
+        title: title ? title : 'Getting Started with Klaynt Basics',
+        description: description
+          ? description
+          : 'Klaynt Basics concepts to get started in your journey with Klaynt.',
+        rewardAmount: rewardAmount ? rewardAmount : '0.99 USDC',
+        experiencePoint: experiencePoint ? experiencePoint : '100XP',
+        level: level ? level : 1,
+        creator: account
+          ? account
+          : '0xf4eA652F5B7b55f1493631Ea4aFAA63Fe0acc27C',
+        subscriptionFee: subscriptionFee ? subscriptionFee : '0.20 USDC',
+        questionsArray: data ? data : dummyData,
+      }
 
-    // SECOND PART (maybe a json obj global {})
-    // const tempQuiz = [
-    //   {
-    //     question: 'Who is Steve Jobs?',
-    //     answers: [
-    //       'CEO of Microsoft',
-    //       'Barber in NY',
-    //       'Movie Star',
-    //       'CEO of Apple',
-    //     ],
-    //     correct: 3,
-    //   },
+      const client = new NFTStorage({ token: apiKey })
+      const metadata = await client.store({
+        name: title ? title : 'Getting Started with Klaynt Basics',
+        description: JSON.stringify(obj),
+        image: new File([image], 'imageName', { type: 'image/*' }),
+      })
 
-    // ]
-  )
+      if (metadata) {
+        const url = metadata?.url.substring(7)
+        const fullUrl = `https://cloudflare-ipfs.com/ipfs/${url}`
+        console.log('fullUrl', fullUrl)
+
+        // const saveToContract = await contract.addTask(
+        //   fullUrl,
+        //   rewardAmountInt,
+        //   subscriptionFeeInt,
+        //   { value: ethers.utils.parseEther(rewardAmount) },
+        // )
+        // const tx = await saveToContract.wait()
+        // console.log('___tx__', tx)
+        // const transationId = tx?.to
+        // console.log('transationId', transationId)
+
+        // const getAllTasks = await contract.getAllTasks()
+        // console.log("All Tasks are here: ", getAllTasks)
+
+        //here we need to allow for selection of task Id and the subscriptionFee
+        // const subscribe = await contract.subscribe(6, 
+        //   { value: ethers.utils.parseEther(subscriptionFee) })
+        //   console.log("_______", subscribe)
+
+        // const completeTask = await contract.completeTask("0xab9c475dE99c213DB8c9CAaE86478CCEA367f508", 24)
+        // console.log("This task was completed. Now the winner can get his reward", completeTask)
+
+        // const contractBalance = await contract.contractBalance()
+        // const getBalance = BigInt(parseInt(contractBalance, 10))
+        // console.log("This contract has: ", getBalance)
+
+        //   let getAllTasksByWinner = await contract.getAllTasksByWinner("0xab9c475dE99c213DB8c9CAaE86478CCEA367f508")
+        // getAllTasksByWinner = getAllTasksByWinner.toString()
+        // console.log("This winner has: ", getAllTasksByWinner)
+
+        // let getAllTasksByOwner = await contract.getAllTasksByOwner("0xab9c475dE99c213DB8c9CAaE86478CCEA367f508")
+        // getAllTasksByOwner = getAllTasksByOwner.toString()
+
+        
+
+
+        // on  success display a button 'See Transaction'
+        //  href https://baobab.scope.klaytn.com/tx/ + txID 0x014ce3aa8bd20739287837f03d7319159310028e21a6b43f8b90a9ea540279a8
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
   const saveQuestion = (e) => {
     e.preventDefault()
@@ -117,7 +191,7 @@ function Create() {
       answers: optionArray,
       correct: correctAnswer,
     }
-    console.log('🚀 ~ file: create.tsx:54 ~ saveQuestion ~ obj', obj)
+    console.log('saveQuestion ~ obj', obj)
     // push it to setData
     setData([...data, obj])
     setQuestion('')
@@ -151,59 +225,6 @@ function Create() {
     )
   }
 
-  function handleClick(e) {
-    e.preventDefault()
-    router.push('/quest/V2zbf8iYGGGzFnkXQ6tB')
-  }
-
-  // const saveToNFTStorage = async () => {
-  //   console.log('saveToNFT')
-  //   try {
-  //     const obj = {
-  //       category: category ? category : 'Other',
-  //       location: location ? location : '123 Broadway Ave New York, NY, 10032',
-  //       coverPhoto: coverPhoto
-  //         ? coverPhoto
-  //         : 'https://media.istockphoto.com/photos/chopping-board-picture-id89342700?k=20&m=89342700&s=170667a&w=0&h=Nh4B8kdpODYG5NwbvS75WxelOxhXlc-4UWu_ijkkmgE=',
-
-  //       description: bio ? bio : 'Comming soon...',
-  //       image: image
-  //         ? image
-  //         : 'https://images.unsplash.com/photo-1494390248081-4e521a5940db?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1106&q=80',
-  //       organizer: ownerWalletAddress
-  //         ? ownerWalletAddress
-  //         : '0x11760DB13aE3Aa5Bca17fC7D62172be2A2Ea9C11',
-  //       targetAmmount: '1000',
-  //       title: position ? position : 'Online Instructor',
-  //       neighborhood: neighborhood ? neighborhood : 'Tribeca',
-  //       hours: hours ? hours : 'Open Everyday',
-  //     }
-
-  //     console.log('what is obj', obj)
-
-  //     const client = new NFTStorage({ token: apiKey })
-  //     const metadata = await client.store({
-  //       name: position,
-  //       description: JSON.stringify(obj),
-  //       image: new File([image], 'imageName', { type: 'image/*' }),
-  //     })
-  //     console.log('metadata', metadata)
-
-  //     if (metadata) {
-  //       console.log('metadata URL', metadata?.url)
-  //       const url = metadata?.url.substring(7) //  bafyreifeiksc7pfbdex5fhes2inqdail7cvf3jfphugtpyzw4rpzte3rca/metadata.json
-  //       const fullUrl = `https://cloudflare-ipfs.com/ipfs/${url}`
-  //       console.log('fullUrl', fullUrl)
-
-  //       const saveToContract = await contract.createClass(fullUrl, '1000')
-  //       const tx = await saveToContract.wait()
-  //       console.log('tx', tx)
-  //       history.push('/')
-  //     }
-  //   } catch (error) {
-  //     console.log(error)
-  //   }
-  // }
 
   return (
     <div style={{ padding: '10rem 10rem ' }}>
@@ -213,6 +234,7 @@ function Create() {
       </Text>
       <div style={{ display: 'flex' }}>
         <Box bg="gray" w="50%" p={10} color="white" minHeight="50rem">
+          <button onClick={run}>Run</button>
           {showFirstPart ? (
             <CreateContentFirstPart
               setShowFirstPart={setShowFirstPart}
@@ -223,6 +245,7 @@ function Create() {
               setLevel={setLevel}
               setRewardAmount={setRewardAmount}
               setExperiencePoint={setExperiencePoint}
+              setSubscriptionFee={setSubscriptionFee}
             />
           ) : (
             <>
@@ -231,7 +254,6 @@ function Create() {
               <Input
                 value={question}
                 onChange={(e) => setQuestion(e.target.value)}
-                placeholder="Here is a sample placeholder"
                 size="md"
               />
 
@@ -292,7 +314,7 @@ function Create() {
               <Button
                 className={styles.savePost}
                 variant="outline"
-                onClick={saveQuestion}
+                onClick={SaveAllAndPublish}
               >
                 Save All & Publish
               </Button>
@@ -326,10 +348,10 @@ function Create() {
 
                 {question.answers
                   ? question.answers.map((answer, idx) => (
-                      <p key={idx} style={{ paddingLeft: '.5rem' }}>
-                        {`${idx + 1}.-`} {answer}
-                      </p>
-                    ))
+                    <p key={idx} style={{ paddingLeft: '.5rem' }}>
+                      {`${idx + 1}.-`} {answer}
+                    </p>
+                  ))
                   : ''}
               </div>
             ))
@@ -340,7 +362,7 @@ function Create() {
                 fontSize: '1.3rem',
               }}
             >
-              Your content will display here!
+              Your quiz will display here!
             </h1>
           )}
         </Box>
