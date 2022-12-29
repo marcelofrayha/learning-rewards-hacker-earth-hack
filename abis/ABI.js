@@ -30,15 +30,40 @@ export const ABI = [
 				"type": "address"
 			},
 			{
-				"internalType": "uint256",
+				"internalType": "uint8",
 				"name": "_taskId",
-				"type": "uint256"
+				"type": "uint8"
 			}
 		],
 		"name": "completeTask",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "_to",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "uint8",
+				"name": "_taskId",
+				"type": "uint8"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "_value",
+				"type": "uint256"
+			}
+		],
+		"name": "rewardCollected",
+		"type": "event"
 	},
 	{
 		"inputs": [
@@ -54,11 +79,74 @@ export const ABI = [
 		"type": "function"
 	},
 	{
+		"anonymous": false,
 		"inputs": [
 			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "_from",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "_value",
+				"type": "uint256"
+			}
+		],
+		"name": "subscribed",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "_from",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "uint8",
+				"name": "_id",
+				"type": "uint8"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "_value",
+				"type": "uint256"
+			}
+		],
+		"name": "taskAdded",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "_to",
+				"type": "address"
+			},
+			{
+				"indexed": true,
 				"internalType": "uint256",
 				"name": "_taskId",
 				"type": "uint256"
+			}
+		],
+		"name": "taskCompleted",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint8",
+				"name": "_taskId",
+				"type": "uint8"
 			}
 		],
 		"name": "transferReward",
@@ -97,9 +185,9 @@ export const ABI = [
 			{
 				"components": [
 					{
-						"internalType": "uint256",
+						"internalType": "uint8",
 						"name": "id",
-						"type": "uint256"
+						"type": "uint8"
 					},
 					{
 						"internalType": "string",
@@ -248,9 +336,9 @@ export const ABI = [
 		"name": "tasks",
 		"outputs": [
 			{
-				"internalType": "uint256",
+				"internalType": "uint8",
 				"name": "id",
-				"type": "uint256"
+				"type": "uint8"
 			},
 			{
 				"internalType": "string",

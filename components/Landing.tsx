@@ -2,17 +2,11 @@ import { Button, VStack, Image, Box, Text, Spinner } from '@chakra-ui/react'
 import { handleConnect } from '@utils/web3'
 import { useState, useContext, useEffect } from 'react'
 import styles from '../styles/Home.module.css'
-import { useTron } from './TronProvider'
 import withTransition from './withTransition'
 import { MyAppContext } from '../pages/_app'
 import { ethers } from "ethers"
 import { ABI } from '../abis/ABI'
-import hre from 'hardhat'
-import { InjectedConnector } from "@web3-react/injected-connector";
-import { useEthers } from "@usedapp/core"
-
-const injected = new InjectedConnector({ supportedChainIds: [1, 4, 1001] });
-
+import { disconnect } from 'process'
 
 const getEthereumObject = () => window.ethereum;
 
@@ -35,6 +29,8 @@ const findAccount = async () => {
     console.log("We have the Ethereum object", ethereum);
     const accounts = await ethereum.request({ method: "eth_accounts" });
 
+
+
     if (accounts.length !== 0) {
       const account = accounts[0];
       console.log("Found an authorized account:", account);
@@ -49,7 +45,7 @@ const findAccount = async () => {
   }
 };
 
-function Landing() {
+export function Landing() {
   const [isLoading, setLoading] = useState<boolean>(false)
   const {
     account,
@@ -69,6 +65,31 @@ function Landing() {
    * More technically, when the App component "mounts".
    */
 
+ 
+
+  useEffect(() => {
+    findAccount().then(async (account) => {
+      if (account !== null) {
+        setAccount(account);
+        const providerTemp = new ethers.providers.Web3Provider(window.ethereum)
+        setProvider(providerTemp)
+        const { chainId } = await providerTemp.getNetwork()
+        console.log('here chainId', chainId)
+        const deployedContract = '0x7b2758469161F93372Fd20f99A7bbA2059E7CBC5'
+        const signer = providerTemp.getSigner()
+        setSigner(signer)
+
+        if (chainId == '1001') {
+          let tempContract = new ethers.Contract(deployedContract, ABI, signer)
+          setContract(tempContract)
+          getAllTasks(tempContract)
+        } else {
+          alert('Please connect to Klaynt Test Network!')
+        }
+      }
+    });
+  }, [account]);
+
   const connectWallet = async () => {
     try {
       const ethereum = getEthereumObject();
@@ -76,53 +97,22 @@ function Landing() {
         alert("Get a Wallet!");
         return;
       }
+      const providerTemp = new ethers.providers.Web3Provider(window.ethereum)
 
-      const accounts = await ethereum.request({
-        method: "eth_requestAccounts",
-      });
-
-      console.log("Connected", accounts[0]);
-      setAccount(accounts[0]);
+      providerTemp.send("eth_requestAccounts", [])
+      .then((accounts)=>{
+        if(accounts.length>0) setAccount(accounts[0])
+      })
+      
     } catch (error) {
       console.error(error);
     }
-
-    const providerTemp = new ethers.providers.Web3Provider(window.ethereum)
-    setProvider(providerTemp)
-    const { chainId } = await providerTemp.getNetwork()
-    console.log('here chainId', chainId)
-    const deployedContract = '0xc5E2df91ff790fb46FF0A8BfFf69A2F87fC293bc'
-    const signer = providerTemp.getSigner()
-    setSigner(signer)
-
-    if (chainId == '1001') {
-      let tempContract = new ethers.Contract(deployedContract, ABI, signer)
-      setContract(tempContract)
-      getAllTasks(tempContract)
-    } else {
-      alert('Please connect to Klaynt Test Network!')
-    }
   };
+  function onClickDisconnect() {
+    console.log("onClickDisconnect")
+    setAccount(undefined)
+  }
 
-  useEffect(() => {
-    findAccount().then((account) => {
-      if (account !== null) {
-        setAccount(account);
-      }
-    });
-  }, []);
-
-  const { activate } = useEthers();
-
-  useEffect(() => {
-    injected.isAuthorized().then((isAuthorized) => {
-      if (isAuthorized) {
-        activate(injected);
-      }
-    });
-  }, [activate]); 
-
-  
 
   // useEffect(() => {
   //   setN(new Date().getTime())
@@ -161,12 +151,15 @@ function Landing() {
   //     .catch((e) => console.log(e))
   // }
 
+
+  
+
   const getAllTasks = async (contract) => {
     const allTasks = await contract.getAllTasks()
-    console.log('🚀Landing.tsx:79 ~ getAllTasks ~ allTasks', allTasks)
     setAllTasks(allTasks)
+    console.log('🚀Landing.tsx:79 ~ getAllTasks ~ allTasks', allTasks)
   }
-    
+
   return (
     <div className={styles.container}>
       <main className={styles.landing}>
@@ -187,7 +180,7 @@ function Landing() {
             MY connectWallet
           </Button>
           <Button
-            onClick={() => handleConnect(setLoading, setAddress, provider)}
+            onClick={() => onClickDisconnect}
             className={styles.connectButton}
           >
             {isLoading ? <Spinner color="white" /> : 'Connect Wallet'}

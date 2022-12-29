@@ -143,6 +143,12 @@ function Create() {
         const transationId = tx?.to
         console.log('transationId', transationId)
 
+        const event = contract.on("taskAdded")
+
+        
+        console.log(event)
+
+
         // const getAllTasks = await contract.getAllTasks()
         // console.log("All Tasks are here: ", getAllTasks)
 
@@ -168,7 +174,9 @@ function Create() {
         // const completeTask = await contract.completeTask("0x4054d8969a12209b6d3C9Cd99377C759303823CD", 1)
         // await completeTask.wait()
         // let transferReward = await contract.transferReward(1)
-        
+
+
+
         // on  success display a button 'See Transaction'
         //  href https://baobab.scope.klaytn.com/tx/ + txID 0x014ce3aa8bd20739287837f03d7319159310028e21a6b43f8b90a9ea540279a8
       }

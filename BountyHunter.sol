@@ -6,7 +6,7 @@ import "hardhat/console.sol";
 
 contract BountyHunter {
     struct Task {
-        uint256 id;
+        uint8 id;
         string IPFSCid;
         uint256 reward;
         bool completed;
@@ -15,25 +15,30 @@ contract BountyHunter {
     }
 
     struct TaskId {
-        uint256 id;
+        uint id;
     }
 
-    uint256 id = 0;
+    uint8 id = 0;
 
     mapping(uint256 => address) public ownerById;
     mapping(uint256 => address) public winner;
     mapping(address => uint[]) tasksByWinner;
+    mapping(address => uint[]) tasksByOwner;
     mapping(address => TaskId[]) subscriptions;
 
     Task[] public tasks;
-    Task[] public tasksByOwner;
+
+    event taskAdded(address indexed _from, uint8 indexed _id, uint _value);
+    event subscribed(address indexed _from, uint _value);
+    event taskCompleted(address indexed _to, uint indexed _taskId);
+    event rewardCollected(address indexed _to, uint8 indexed _taskId, uint _value);
 
     function addTask(
         string memory _IPFSCid,
         uint256 _reward,
         uint256 _price
     ) public payable {
-        require(msg.value >= _reward);
+        require(msg.value >= _reward, "You forgot to transfer the reward");
         tasks.push(
             Task({
                 id: id,
@@ -44,8 +49,11 @@ contract BountyHunter {
                 price: _price
             })
         );
+        tasksByOwner[msg.sender].push(id);
         ownerById[id] = msg.sender;
+        emit taskAdded(msg.sender, id, msg.value);
         id++;
+
     }
 
     function getOwnerById(uint256 _id) public view returns (address) {
@@ -57,25 +65,16 @@ contract BountyHunter {
     }
 
     function getAllTasksByOwner(address _owner)
-        public
-        returns (Task[] memory)
+        public view
+        returns (uint[] memory)
     {
-        for (uint256 i = 0; i <= id; i++) {
-            if (ownerById[i] == _owner) {
-                tasksByOwner.push(
-                    Task({
-                        id: tasks[i].id,
-                        IPFSCid: tasks[i].IPFSCid,
-                        reward: tasks[i].reward,
-                        completed: tasks[i].completed,
-                        owner: tasks[i].owner,
-                        price: tasks[i].price
-                    })
-                );
-            }
-        }
-        return tasksByOwner;
+        return tasksByOwner[_owner];
+        
     }
+
+    // function getAllTasksByOwner() public view returns (Task[] memory) {
+    //     return tasksByOwner;
+    // }
 
     function getAllTasksByWinner(address _winner)
         public view
@@ -85,9 +84,10 @@ contract BountyHunter {
     }
 
     function subscribe(uint256 _taskId) public payable {
-        require(msg.value >= tasks[_taskId].price);
+        require(msg.value >= tasks[_taskId].price, "You did not send enough money");
         subscriptions[msg.sender].push(TaskId(_taskId));
         tasks[_taskId].reward += msg.value;
+        emit subscribed(msg.sender, msg.value);
     }
 
     function getSubscriptions(address _subscriber)
@@ -98,23 +98,25 @@ contract BountyHunter {
         return subscriptions[_subscriber];
     }
 
-    function transferReward(uint256 _taskId)
+    function transferReward(uint8 _taskId)
         public
         payable
         returns (bool, bytes memory)
     {
-        require(winner[_taskId] == msg.sender);
+        require(winner[_taskId] == msg.sender, "You must be the winner to collect the reward");
         (bool sent, bytes memory data) = msg.sender.call{
             value: tasks[_taskId].reward
         }("");
+        emit rewardCollected(msg.sender, _taskId, msg.value);
         return (sent, data);
     }
 
-    function completeTask(address _to, uint256 _taskId) public {
-        require(tasks[_taskId].owner == msg.sender);
+    function completeTask(address _to, uint8 _taskId) public {
+        require(tasks[_taskId].owner == msg.sender, "You're not the owner of this task");
         winner[_taskId] = _to;
         tasksByWinner[_to].push(_taskId);
         tasks[_taskId].completed = true;
+        emit taskCompleted(_to, _taskId);
     }
 
     function contractBalance() public view returns (uint256) {
