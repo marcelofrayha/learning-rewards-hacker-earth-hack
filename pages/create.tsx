@@ -85,9 +85,10 @@ function Create() {
     if (!account || !contract) alert('Please connect your wallet!')
 
     try {
-      const completeTask = await contract.completeTask("0x4054d8969a12209b6d3C9Cd99377C759303823CD", 1)
-      await completeTask.wait()
-      let transferReward = await contract.transferReward(1)
+      
+        const contractBalance = await contract.contractBalance()
+        const getBalance = BigInt(parseInt(contractBalance, 10))
+        console.log("This contract has: ", getBalance)
     } catch (error) {
       console.log(error)
     }
@@ -145,7 +146,7 @@ function Create() {
 
         const event = contract.on("taskAdded")
 
-        
+
         console.log(event)
 
 

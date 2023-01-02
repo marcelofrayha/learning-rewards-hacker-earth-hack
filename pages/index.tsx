@@ -12,9 +12,11 @@ function Home() {
   const { address } = useTron()
   const [width, setWidth] = useState<number>(window.innerWidth)
 
-  function handleWindowSizeChange() {
-    setWidth(window.innerWidth)
-  }
+
+    function handleWindowSizeChange() {
+      setWidth(window.innerWidth)
+    }
+  
 
   useEffect(() => {
     window.addEventListener('resize', handleWindowSizeChange)
